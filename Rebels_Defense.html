@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rebels Defense Drill</title>
+<style>
+  /* System font fallbacks — no internet required */
+</style>
+<style>
+  :root {
+    --rebels-blue: #1a56b0;
+    --rebels-blue-dark: #0f3a7a;
+    --rebels-blue-light: #2d6fd4;
+    --rebels-red: #d42b2b;
+    --rebels-red-dark: #a01e1e;
+    --rebels-red-light: #e84040;
+    --rebels-white: #ffffff;
+    --rebels-bg: #ffffff;
+    --rebels-card: #ffffff;
+    --rebels-card-light: #f7f9fd;
+    --rebels-border: rgba(26,86,176,0.15);
+    --rebels-text: #0f2044;
+    --rebels-text-dim: #4a6490;
+    /* Legacy aliases */
+    --green: #1a56b0;
+    --dark-green: #0f3a7a;
+    --grass: #2d6fd4;
+    --dirt: #c8a46e;
+    --sky: #f0f4fa;
+    --red: #d42b2b;
+    --gold: #0f3a7a;
+    --white: #fff;
+    --navy: #0f3a7a;
+    --orange: #e84040;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Arial, sans-serif;
+background: #ffffff;
+min-height: 100vh;
+overflow-x: hidden;
+position: relative;
+color: #0f2044;
+}
+
+body::before { display: none; }
+body::after { display: none; }
+
+.cloud { display: none; }
+
+/* Scoreboard / header */
+.scoreboard {
+background: white;
+border-bottom: 5px solid #d42b2b;
+padding: 12px 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+box-shadow: 0 2px 16px rgba(15,58,122,0.12);
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.logo-area {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.baseball-icon {
+width: 48px;
+height: 48px;
+animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+
+.game-title {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+color: #ffffff;
+font-size: 1.8rem;
+line-height: 1;
+text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.game-title span {
+color: #e84040;
+font-size: 0.85rem;
+display: block;
+letter-spacing: 2px;
+text-transform: uppercase;
+}
+
+.score-display {
+display: flex;
+gap: 20px;
+align-items: center;
+}
+
+.score-box {
+background: #f0f4fa;
+border: 2px solid #1a56b0;
+border-radius: 12px;
+padding: 6px 16px;
+text-align: center;
+min-width: 70px;
+}
+
+.score-label {
+color: #1a56b0;
+font-size: 0.65rem;
+text-transform: uppercase;
+letter-spacing: 1px;
+font-weight: 800;
+}
+
+.score-value {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+color: #0f3a7a;
+font-size: 1.6rem;
+line-height: 1;
+}
+
+/* Main game area */
+.game-container {
+max-width: 760px;
+margin: 0 auto;
+padding: 24px 16px;
+}
+
+/* Progress bar */
+.progress-track {
+background: rgba(0,0,0,0.2);
+border-radius: 20px;
+height: 14px;
+margin-bottom: 20px;
+overflow: hidden;
+border: 2px solid rgba(255,255,255,0.3);
+}
+
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, #a01e1e, #e84040);
+border-radius: 20px;
+transition: width 0.5s ease;
+position: relative;
+}
+
+.progress-fill::after {
+content: ‘⚾’;
+position: absolute;
+right: -4px;
+top: 50%;
+transform: translateY(-50%);
+font-size: 16px;
+filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.4));
+}
+
+/* Question card */
+.question-card {
+background: white;
+border-radius: 24px;
+padding: 28px;
+box-shadow: 0 4px 24px rgba(15,58,122,0.10), 0 1px 4px rgba(0,0,0,0.06);
+border: 2px solid rgba(26,86,176,0.12);
+margin-bottom: 20px;
+animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.situation-badge {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+background: #1a56b0;
+color: #ffffff !important;
+border-radius: 20px;
+padding: 6px 16px;
+font-size: 0.8rem;
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 1px;
+margin-bottom: 16px;
+border: 1px solid #2d6fd4;
+}
+
+/* Diamond display */
+.diamond-wrap {
+display: flex;
+justify-content: center;
+margin: 16px 0 20px;
+}
+
+.diamond-svg-container {
+position: relative;
+width: 200px;
+height: 190px;
+}
+
+/* Question text */
+.question-text {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1.55rem;
+color: #0f2044;
+text-align: center;
+line-height: 1.3;
+margin-bottom: 8px;
+}
+
+.position-highlight {
+display: inline-block;
+background: #d42b2b;
+color: #ffffff !important;
+padding: 4px 14px;
+border-radius: 8px;
+font-size: 1.4rem;
+font-weight: 900;
+}
+
+/* Answer buttons */
+.answers-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+margin-top: 20px;
+}
+
+.answer-btn {
+background: #f7f9fd;
+border: 2px solid rgba(26,86,176,0.18);
+border-radius: 16px;
+padding: 16px 12px;
+font-family: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Arial, sans-serif;
+font-size: 0.95rem;
+font-weight: 700;
+color: #0f2044;
+cursor: pointer;
+transition: all 0.2s ease;
+text-align: left;
+line-height: 1.3;
+position: relative;
+overflow: hidden;
+}
+
+.answer-btn::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,0.5));
+pointer-events: none;
+}
+
+.answer-btn:hover:not(:disabled) {
+border-color: #1a56b0;
+background: #e8f0fd;
+transform: translateY(-2px);
+box-shadow: 0 4px 16px rgba(26,86,176,0.18);
+}
+
+.answer-btn:active:not(:disabled) {
+transform: translateY(0);
+}
+
+.answer-btn.correct {
+background: #1a56b0;
+border-color: #0f3a7a;
+color: white;
+animation: correctPop 0.4s ease;
+}
+
+.answer-btn.wrong {
+background: #a01e1e;
+border-color: #e84040;
+color: white;
+animation: wrongShake 0.4s ease;
+}
+
+.answer-btn.reveal-correct {
+background: #ddeaff;
+border-color: #1a56b0;
+color: #0f3a7a;
+}
+
+@keyframes correctPop {
+0% { transform: scale(1); }
+50% { transform: scale(1.06); }
+100% { transform: scale(1); }
+}
+
+@keyframes wrongShake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-6px); }
+75% { transform: translateX(6px); }
+}
+
+.answer-letter {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 26px;
+height: 26px;
+background: #1a56b0;
+color: white;
+border-radius: 50%;
+font-size: 0.8rem;
+font-weight: 900;
+margin-right: 8px;
+flex-shrink: 0;
+vertical-align: middle;
+}
+
+.answer-btn.correct .answer-letter,
+.answer-btn.wrong .answer-letter {
+background: rgba(255,255,255,0.3);
+}
+
+/* Feedback overlay */
+.feedback-banner {
+border-radius: 16px;
+padding: 16px 20px;
+text-align: center;
+margin-top: 16px;
+font-weight: 800;
+font-size: 1.1rem;
+display: none;
+animation: fadeIn 0.3s ease;
+}
+
+.feedback-banner.show { display: block; }
+
+.feedback-banner.correct-fb {
+background: #ddeaff;
+border: 2px solid #1a56b0;
+color: #0f3a7a;
+}
+
+.feedback-banner.wrong-fb {
+background: #fde8e8;
+border: 2px solid #d42b2b;
+color: #a01e1e;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(8px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.next-btn {
+display: block;
+width: 100%;
+margin-top: 16px;
+background: #d42b2b;
+color: #ffffff;
+border: none;
+border-radius: 16px;
+padding: 16px;
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1.4rem;
+cursor: pointer;
+transition: all 0.2s ease;
+box-shadow: 0 4px 16px rgba(212,43,43,0.4);
+letter-spacing: 1px;
+}
+
+.next-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(212,43,43,0.55);
+}
+
+/* Stars / streak display */
+.streak-display {
+text-align: center;
+font-size: 1.6rem;
+margin-bottom: 12px;
+letter-spacing: 4px;
+min-height: 36px;
+}
+
+/* End screen */
+.end-screen {
+display: none;
+text-align: center;
+animation: slideIn 0.5s ease;
+}
+
+.end-screen.show { display: block; }
+
+.trophy-area {
+font-size: 5rem;
+margin: 20px 0;
+animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-12px); }
+}
+
+.end-title {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 2.8rem;
+color: #0f3a7a;
+text-shadow: none;
+margin-bottom: 8px;
+}
+
+.end-score-card {
+background: white;
+border: 2px solid rgba(26,86,176,0.12);
+border-radius: 24px;
+padding: 30px;
+box-shadow: 0 4px 24px rgba(15,58,122,0.10);
+margin: 20px 0;
+}
+
+.big-score {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 4rem;
+color: #0f3a7a;
+line-height: 1;
+}
+
+.big-score span {
+font-size: 2rem;
+color: #4a6490;
+}
+
+.rating-text {
+font-size: 1.3rem;
+font-weight: 800;
+color: #1a56b0;
+margin-top: 8px;
+}
+
+.play-again-btn {
+background: #d42b2b;
+color: #ffffff;
+border: none;
+border-radius: 20px;
+padding: 18px 40px;
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1.6rem;
+cursor: pointer;
+box-shadow: 0 6px 20px rgba(212,43,43,0.5);
+transition: all 0.2s ease;
+letter-spacing: 1px;
+margin-top: 8px;
+}
+
+.play-again-btn:hover {
+transform: translateY(-3px);
+box-shadow: 0 10px 28px rgba(212,43,43,0.65);
+}
+
+/* Position selector */
+.position-grid {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 8px;
+margin-bottom: 10px;
+}
+
+.pos-mode-indicator {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background: rgba(212,43,43,0.1);
+border: 2px solid #d42b2b;
+border-radius: 20px;
+padding: 4px 12px;
+color: #a01e1e;
+font-size: 0.75rem;
+font-weight: 800;
+letter-spacing: 0.5px;
+}
+
+/* Start screen */
+.start-screen {
+text-align: center;
+padding: 20px 0;
+animation: slideIn 0.5s ease;
+}
+
+.start-title {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 3rem;
+color: #0f3a7a;
+text-shadow: none;
+line-height: 1;
+margin-bottom: 6px;
+}
+
+.start-subtitle {
+font-size: 1.1rem;
+color: #4a6490;
+font-weight: 700;
+margin-bottom: 24px;
+}
+
+.start-card {
+background: white;
+border: 2px solid rgba(26,86,176,0.12);
+border-radius: 24px;
+padding: 28px;
+box-shadow: 0 4px 20px rgba(15,58,122,0.08);
+margin-bottom: 24px;
+text-align: left;
+}
+
+.how-to-title {
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1.4rem;
+color: #0f3a7a;
+margin-bottom: 14px;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.how-to-item {
+display: flex;
+align-items: flex-start;
+gap: 12px;
+margin-bottom: 12px;
+font-size: 0.95rem;
+font-weight: 700;
+color: #0f2044;
+line-height: 1.3;
+}
+
+.how-to-num {
+background: #1a56b0;
+color: white;
+border-radius: 50%;
+width: 28px;
+height: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1rem;
+flex-shrink: 0;
+}
+
+.pos-btn {
+border: 2px solid rgba(26,86,176,0.18);
+background: #f7f9fd;
+border-radius: 12px;
+padding: 10px 4px 8px;
+cursor: pointer;
+transition: all 0.18s;
+text-align: center;
+font-family: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Arial, sans-serif;
+}
+
+.pos-btn .pos-abbr {
+display: block;
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1.2rem;
+color: #0f3a7a;
+line-height: 1;
+}
+
+.pos-btn .pos-name {
+display: block;
+font-size: 0.58rem;
+color: #4a6490;
+font-weight: 700;
+margin-top: 2px;
+line-height: 1.2;
+}
+
+.pos-btn .pos-emoji {
+display: block;
+font-size: 1.3rem;
+margin-bottom: 2px;
+}
+
+.pos-btn.selected {
+border-color: #d42b2b;
+background: #fde8e8;
+transform: scale(1.06);
+}
+
+.pos-btn.selected .pos-abbr { color: #d42b2b; }
+
+.pos-btn:hover:not(.selected) {
+border-color: #1a56b0;
+background: #e8f0fd;
+}
+
+.pos-all-btn {
+grid-column: span 5;
+border: 2px solid rgba(26,86,176,0.18);
+background: #f7f9fd;
+border-radius: 12px;
+padding: 10px;
+cursor: pointer;
+transition: all 0.18s;
+font-family: ‘Arial Black’, ‘Impact’, ‘Haettenschweiler’, Arial, sans-serif; font-weight: 900; letter-spacing: 0.5px;
+font-size: 1.1rem;
+color: #0f3a7a;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+
+.pos-all-btn.selected {
+border-color: #1a56b0;
+background: #ddeaff;
+color: #0f3a7a;
+}
+
+.pos-all-btn:hover:not(.selected) {
+border-color: #1a56b0;
+background: #e8f0fd;
+}
+
+.diff-btn {
+border: 2px solid rgba(26,86,176,0.18);
+background: #f7f9fd;
+border-radius: 14px;
+padding: 12px 8px;
+cursor: pointer;
+transition: all 0.2s;
+text-align: center;
+font-family: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Arial, sans-serif;
+font-weight: 800;
+font-size: 0.85rem;
+color: #0f2044;
+}
+
+.diff-btn .diff-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+.diff-btn .diff-name { display: block; }
+.diff-btn .diff-desc { font-size: 0.7rem; color: #4a6490; font-weight: 600; display: block; margin-top: 2px; }
+
+.diff-btn.selected {
+border-color: #1a56b0;
+background: #ddeaff;
+}
+
+.diff-btn:hover { border-color: #1a56b0; }
+
+.start-play-btn {
+display: block;
+width: 100%;
+background: #1a56b0;
+color: #ffffff !important;
+border: 3px solid #d42b2b;
+border-radius: 20px;
+padding: 20px;
+font-family: ‘Arial Black’, Impact, Arial, sans-serif;
+font-weight: 900;
+font-size: 1.8rem;
+cursor: pointer;
+box-shadow: 0 6px 24px rgba(26,86,176,0.4);
+transition: all 0.2s ease;
+letter-spacing: 2px;
+}
+
+.start-play-btn:hover {
+transform: translateY(-3px);
+background: #0f3a7a;
+border-color: #d42b2b;
+}
+
+.confetti-piece {
+position: fixed;
+width: 10px;
+height: 10px;
+border-radius: 2px;
+animation: confettiFall linear forwards;
+pointer-events: none;
+z-index: 9999;
+}
+
+@keyframes confettiFall {
+0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.q-counter {
+font-size: 0.85rem;
+font-weight: 800;
+color: #4a6490;
+text-align: center;
+margin-bottom: 8px;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+</style>
+
+</head>
+<body>
+
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+<div class="cloud cloud3"></div>
+
+<!-- SCOREBOARD -->
+
+<div class="scoreboard">
+  <div class="logo-area">
+    <div style="display:flex;flex-direction:column;line-height:1;">
+      <div style="font-family:'Arial Black',Impact,Arial,sans-serif;font-size:1.9rem;font-weight:900;letter-spacing:2px;color:#0f3a7a;text-shadow:-1px -1px 0 #d42b2b, 1px -1px 0 #d42b2b, -1px 1px 0 #d42b2b, 2px 2px 0 #a01e1e;-webkit-text-stroke:1px #d42b2b;">REBELS</div>
+      <div style="font-family:'Arial Black',Impact,Arial,sans-serif;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:#d42b2b;font-weight:900;margin-top:2px;">Defense Drill</div>
+    </div>
+  </div>
+  <div class="score-display">
+    <div class="pos-mode-indicator" id="posModeIndicator" style="display:none;">🧤 <span id="posModeLabel">P</span></div>
+    <div class="score-box">
+      <div class="score-label">⭐ Score</div>
+      <div class="score-value" id="scoreVal">0</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">🔥 Streak</div>
+      <div class="score-value" id="streakVal">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME CONTAINER -->
+
+<div class="game-container">
+
+  <!-- START SCREEN -->
+
+  <div class="start-screen" id="startScreen">
+    <div class="trophy-area">⚾</div>
+    <div class="start-title">Rebels Defense!</div>
+  
+
+
+<div class="start-card">
+  <div class="how-to-title">📋 How to Play</div>
+  <div class="how-to-item"><div class="how-to-num">1</div><div>You'll see a baseball situation — where the ball is hit and who's on base.</div></div>
+  <div class="how-to-item"><div class="how-to-num">2</div><div>A position will light up on the diamond. What should THAT player do?</div></div>
+  <div class="how-to-item"><div class="how-to-num">3</div><div>Pick the right answer to earn points! Streaks = BONUS points! 🔥</div></div>
+</div>
+
+<div class="start-card">
+  <div class="how-to-title">🧤 Pick Your Position</div>
+  <div class="position-grid">
+    <button class="pos-btn" onclick="selectPosition(this,'P')">
+      <span class="pos-emoji">⚾</span><span class="pos-abbr">P</span><span class="pos-name">Pitcher</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'C')">
+      <span class="pos-emoji">🥎</span><span class="pos-abbr">C</span><span class="pos-name">Catcher</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'1B')">
+      <span class="pos-emoji">🟫</span><span class="pos-abbr">1B</span><span class="pos-name">First Base</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'2B')">
+      <span class="pos-emoji">🟫</span><span class="pos-abbr">2B</span><span class="pos-name">Second Base</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'SS')">
+      <span class="pos-emoji">⚡</span><span class="pos-abbr">SS</span><span class="pos-name">Shortstop</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'3B')">
+      <span class="pos-emoji">🟫</span><span class="pos-abbr">3B</span><span class="pos-name">Third Base</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'LF')">
+      <span class="pos-emoji">🌿</span><span class="pos-abbr">LF</span><span class="pos-name">Left Field</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'CF')">
+      <span class="pos-emoji">🌿</span><span class="pos-abbr">CF</span><span class="pos-name">Center Field</span>
+    </button>
+    <button class="pos-btn" onclick="selectPosition(this,'RF')">
+      <span class="pos-emoji">🌿</span><span class="pos-abbr">RF</span><span class="pos-name">Right Field</span>
+    </button>
+    <button class="pos-all-btn selected" id="posBtn-ALL" onclick="selectPosition(this,'ALL')">
+      ⭐ All Positions — Test the whole team!
+    </button>
+  </div>
+  <div id="posWarning" style="display:none;font-size:0.8rem;color:#92400e;background:#fef3c7;border-radius:8px;padding:8px 12px;font-weight:700;margin-top:4px;">
+    ⚠️ Not many questions for this position — you may see some repeats!
+  </div>
+</div>
+
+<div class="start-card">
+  <div class="how-to-title">⚾ Pick Your Level</div>
+  <div class="difficulty-select">
+    <div class="diff-btn selected" onclick="selectDiff(this,'easy')" id="diff-easy">
+      <span class="diff-icon">😊</span>
+      <span class="diff-name">Rookie</span>
+      <span class="diff-desc">2 choices</span>
+    </div>
+    <div class="diff-btn" onclick="selectDiff(this,'medium')" id="diff-medium">
+      <span class="diff-icon">😤</span>
+      <span class="diff-name">All-Star</span>
+      <span class="diff-desc">3 choices</span>
+    </div>
+    <div class="diff-btn" onclick="selectDiff(this,'hard')" id="diff-hard">
+      <span class="diff-icon">🔥</span>
+      <span class="diff-name">Pro</span>
+      <span class="diff-desc">4 choices</span>
+    </div>
+  </div>
+</div>
+
+<button class="start-play-btn" onclick="startGame()">⚾ PLAY BALL! ⚾</button>
+
+
+  </div>
+
+  <!-- GAME SCREEN -->
+
+  <div id="gameScreen" style="display:none;">
+    <div class="streak-display" id="streakStars"></div>
+
+
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill" style="width:0%"></div>
+</div>
+
+<div class="q-counter" id="qCounter">Question 1 of 10</div>
+
+<div class="question-card" id="questionCard">
+  <div class="situation-badge" id="situationBadge">🏟️ Situation</div>
+  <div class="diamond-wrap">
+    <div class="diamond-svg-container">
+      <svg id="diamondSvg" viewBox="0 0 200 190" width="200" height="190">
+        <!-- Outfield grass -->
+        <ellipse cx="100" cy="80" rx="95" ry="80" fill="#4CAF50"/>
+        <!-- Infield dirt -->
+        <polygon points="100,10 190,100 100,180 10,100" fill="#c8a46e"/>
+        <!-- Infield grass -->
+        <polygon points="100,40 160,100 100,160 40,100" fill="#56ad5e"/>
+        <!-- Base paths -->
+        <line x1="100" y1="160" x2="160" y2="100" stroke="#e8d5a0" stroke-width="1.5"/>
+        <line x1="160" y1="100" x2="100" y2="40" stroke="#e8d5a0" stroke-width="1.5"/>
+        <line x1="100" y1="40" x2="40" y2="100" stroke="#e8d5a0" stroke-width="1.5"/>
+        <line x1="40" y1="100" x2="100" y2="160" stroke="#e8d5a0" stroke-width="1.5"/>
+        <!-- Bases -->
+        <rect id="base1" x="153" y="93" width="14" height="14" rx="2" fill="white" stroke="#aaa" stroke-width="1"/>
+        <rect id="base2" x="93" y="33" width="14" height="14" rx="2" fill="white" stroke="#aaa" stroke-width="1"/>
+        <rect id="base3" x="33" y="93" width="14" height="14" rx="2" fill="white" stroke="#aaa" stroke-width="1"/>
+        <!-- Home plate -->
+        <polygon id="homePlate" points="100,170 108,163 108,154 92,154 92,163" fill="white" stroke="#aaa" stroke-width="1"/>
+        <!-- Pitcher's mound -->
+        <circle cx="100" cy="105" r="8" fill="#d4a96a"/>
+        <!-- Position labels -->
+        <text id="pos-P"  x="100" y="109" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#5a3e1b" font-weight="bold">P</text>
+        <text id="pos-C"  x="100" y="148" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#5a3e1b" font-weight="bold">C</text>
+        <text id="pos-1B" x="145" y="118" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#5a3e1b" font-weight="bold">1B</text>
+        <text id="pos-2B" x="130" y="72" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#5a3e1b" font-weight="bold">2B</text>
+        <text id="pos-SS" x="70" y="72" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#5a3e1b" font-weight="bold">SS</text>
+        <text id="pos-3B" x="55" y="118" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#5a3e1b" font-weight="bold">3B</text>
+        <text id="pos-LF" x="38" y="42" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#1a4d24" font-weight="bold">LF</text>
+        <text id="pos-CF" x="100" y="20" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#1a4d24" font-weight="bold">CF</text>
+        <text id="pos-RF" x="162" y="42" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Impact,Arial,sans-serif" font-weight="bold" font-size="11" fill="#1a4d24" font-weight="bold">RF</text>
+        <!-- Runner dots — hidden by default -->
+        <circle id="runner1B" cx="160" cy="100" r="7" fill="#e63946" stroke="white" stroke-width="2" opacity="0"/>
+        <circle id="runner2B" cx="100" cy="40" r="7" fill="#e63946" stroke="white" stroke-width="2" opacity="0"/>
+        <circle id="runner3B" cx="40" cy="100" r="7" fill="#e63946" stroke="white" stroke-width="2" opacity="0"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="question-text" id="questionText">What should the <span class="position-highlight">SS</span> do?</div>
+
+  <div class="answers-grid" id="answersGrid"></div>
+
+  <div class="feedback-banner" id="feedbackBanner"></div>
+  <button class="next-btn" id="nextBtn" style="display:none;" onclick="nextQuestion()">Next Play ➜</button>
+</div>
+
+
+  </div>
+
+  <!-- END SCREEN -->
+
+  <div class="end-screen" id="endScreen">
+    <div class="trophy-area" id="trophyEmoji">🏆</div>
+    <div class="end-title" id="endTitle">Game Over!</div>
+    <div class="end-score-card">
+      <div class="big-score"><span>Score: </span><span id="finalScore">0</span></div>
+      <div class="big-score" style="margin-top:8px;"><span>Correct: </span><span id="finalCorrect">0</span><span>/10</span></div>
+      <div class="rating-text" id="ratingText"></div>
+    </div>
+    <button class="play-again-btn" onclick="resetGame()">⚾ Play Again!</button>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// QUESTION DATA — extracted from TRC Defensive Situations PDF
+// ============================================================
+const allQuestions = [
+  // FLY BALL SITUATIONS - No runners
+  { situation:"Fly Ball to LF", runners:[], position:"P",  correct:"Back up between mound and 2B", wrong:["Cover home plate","Cover 3B bag","Line up relay from LF"] },
+  { situation:"Fly Ball to LF", runners:[], position:"C",  correct:"Follow runner to 1B (back up overthrow)", wrong:["Protect home plate","Cover 2B","Back up LF"] },
+  { situation:"Fly Ball to LF", runners:[], position:"1B", correct:"See runner touch 1B, then cover the bag", wrong:["Cover 2B","Run to back up LF","Throw to home"] },
+  { situation:"Fly Ball to LF", runners:[], position:"2B", correct:"Move into position to cover 2B", wrong:["Back up 3B","Cover 1B","Line up relay"] },
+  { situation:"Fly Ball to LF", runners:[], position:"SS", correct:"Line up relay throw from LF", wrong:["Cover 2B","Back up LF","Stay near 3B"] },
+  { situation:"Fly Ball to LF", runners:[], position:"LF", correct:"Make a hard throw to 2B (or hit cut-off if too far)", wrong:["Throw directly to home","Back up CF","Hold the ball"] },
+  { situation:"Fly Ball to LF", runners:[], position:"CF", correct:"Back up LF", wrong:["Back up RF","Cover 2B","Line up relay"] },
+  { situation:"Fly Ball to CF", runners:[], position:"P",  correct:"Back up between mound and 2B", wrong:["Cover home plate","Cover 3B","Back up CF"] },
+  { situation:"Fly Ball to CF", runners:[], position:"2B", correct:"Cover 2B (if ball to SS side), otherwise you are cut-off", wrong:["Always cover 2B","Back up CF","Cover 1B"] },
+  { situation:"Fly Ball to CF", runners:[], position:"SS", correct:"Cover 2B (if ball to 2B side), otherwise you are cut-off", wrong:["Always line up relay","Back up 3B","Cover 3B"] },
+  { situation:"Fly Ball to CF", runners:[], position:"CF", correct:"Throw to 2B or cut off", wrong:["Throw to 3B","Throw home","Hold the ball"] },
+  { situation:"Fly Ball to RF", runners:[], position:"P",  correct:"Back up between mound and SS position", wrong:["Cover home plate","Cover 3B","Back up RF"] },
+  { situation:"Fly Ball to RF", runners:[], position:"2B", correct:"You are the cut-off", wrong:["Cover 2B","Back up RF","Line up relay"] },
+  { situation:"Fly Ball to RF", runners:[], position:"SS", correct:"Cover 2B", wrong:["Line up relay","Back up 3B","You are cut-off"] },
+  { situation:"Fly Ball to RF", runners:[], position:"LF", correct:"Back up position behind SS", wrong:["Back up RF","Cover 3B","Line up relay"] },
+  { situation:"Fly Ball to RF", runners:[], position:"RF", correct:"Throw to 2B or cut off", wrong:["Throw home","Hold the ball","Back up CF"] },
+  // FLY BALL - Runner on 1st
+  { situation:"Fly Ball to LF", runners:["1B"], position:"P",  correct:"Back up between 3B and home plate", wrong:["Back up between mound and 2B","Cover 3B","Cover home plate"] },
+  { situation:"Fly Ball to LF", runners:["1B"], position:"C",  correct:"Protect home plate", wrong:["Follow runner to 1B","Back up 3B","Cover 2B"] },
+  { situation:"Fly Ball to LF", runners:["1B"], position:"SS", correct:"You are the cut-off", wrong:["Cover 2B","Line up relay from LF","Back up 3B"] },
+  { situation:"Fly Ball to LF", runners:["1B"], position:"3B", correct:"Cover 3B bag", wrong:["Back up SS","Cover home plate","Back up 3B"] },
+  { situation:"Fly Ball to LF", runners:["1B"], position:"LF", correct:"Throw to 3B or cut off", wrong:["Throw to 2B","Throw directly home","Hold the ball"] },
+  { situation:"Fly Ball to CF", runners:["1B"], position:"C",  correct:"Protect home plate", wrong:["Follow runner to 1B","Back up CF","Cover 2B"] },
+  { situation:"Fly Ball to CF", runners:["1B"], position:"SS", correct:"You are the cut-off", wrong:["Cover 2B","Line up relay","Back up 3B"] },
+  { situation:"Fly Ball to CF", runners:["1B"], position:"3B", correct:"Cover 3B bag", wrong:["Back up SS","Cover home","Back up LF"] },
+  { situation:"Fly Ball to CF", runners:["1B"], position:"CF", correct:"Throw to 3B or cut off", wrong:["Throw to 2B","Throw directly home","Back up LF"] },
+  { situation:"Fly Ball to RF", runners:["1B"], position:"P",  correct:"Back up between 3B and home plate", wrong:["Back up between mound and SS","Cover home plate","Cover 3B"] },
+  { situation:"Fly Ball to RF", runners:["1B"], position:"SS", correct:"You are the cut-off", wrong:["Cover 2B","Back up 3B","Line up relay"] },
+  { situation:"Fly Ball to RF", runners:["1B"], position:"3B", correct:"Cover 3B bag", wrong:["Back up SS","Cover home","Back up LF"] },
+  { situation:"Fly Ball to RF", runners:["1B"], position:"RF", correct:"Throw to 3B or cut off", wrong:["Throw to 2B","Throw home","Hold the ball"] },
+  // FLY BALL - Runner on 2nd
+  { situation:"Fly Ball to LF", runners:["2B"], position:"C",  correct:"Protect home plate — be ready for the throw", wrong:["Follow runner to 1B","Back up 3B","Cover 2B"] },
+  { situation:"Fly Ball to LF", runners:["2B"], position:"SS", correct:"You are the cut-off", wrong:["Cover 2B","Line up relay","Back up 3B"] },
+  { situation:"Fly Ball to LF", runners:["2B"], position:"LF", correct:"Throw home or cut off", wrong:["Throw to 3B","Throw to 2B","Hold the ball"] },
+  { situation:"Fly Ball to CF", runners:["2B"], position:"C",  correct:"Protect home plate — be ready for the throw", wrong:["Follow runner","Back up CF","Cover 2B"] },
+  { situation:"Fly Ball to CF", runners:["2B"], position:"CF", correct:"Throw home or cut off", wrong:["Throw to 3B","Throw to 2B","Hold the ball"] },
+  { situation:"Fly Ball to RF", runners:["2B"], position:"P",  correct:"Back up between 3B and home plate", wrong:["Cover home plate","Back up between mound and SS","Cover 3B"] },
+  { situation:"Fly Ball to RF", runners:["2B"], position:"2B", correct:"You are the cut-off", wrong:["Cover 2B","Back up RF","Line up relay"] },
+  { situation:"Fly Ball to RF", runners:["2B"], position:"RF", correct:"Throw home or cut off", wrong:["Throw to 3B","Throw to 2B","Hold the ball"] },
+  // GROUNDERS - No runners
+  { situation:"Grounder to 3B", runners:[], position:"P",  correct:"Move into position to cover home plate", wrong:["Back up 3B","Cover 1B","Cover 3B bag"] },
+  { situation:"Grounder to 3B", runners:[], position:"SS", correct:"Back up 3B", wrong:["Cover 2B","Cover 3B","Back up 1B"] },
+  { situation:"Grounder to 3B", runners:[], position:"3B", correct:"Field ball and throw to 1B", wrong:["Throw to 2B","Throw home","Tag runner"] },
+  { situation:"Grounder to SS", runners:[], position:"P",  correct:"Move into position to cover 3B", wrong:["Cover home plate","Back up 1B","Cover 1B"] },
+  { situation:"Grounder to SS", runners:[], position:"SS", correct:"Field ball and throw to 1B", wrong:["Throw to 2B","Throw home","Tag runner"] },
+  { situation:"Grounder to SS", runners:[], position:"3B", correct:"Back up SS", wrong:["Cover 3B","Cover 2B","Cover home"] },
+  { situation:"Grounder to 2B", runners:[], position:"SS", correct:"Cover 2B", wrong:["Back up 2B","Cover 3B","Back up 3B"] },
+  { situation:"Grounder to 2B", runners:[], position:"2B", correct:"Field ball and throw to 1B", wrong:["Throw to 2B","Hold the ball","Throw home"] },
+  { situation:"Grounder to 1B", runners:[], position:"P",  correct:"Move into position to cover 1B", wrong:["Cover home plate","Back up 3B","Cover 3B"] },
+  { situation:"Grounder to 1B", runners:[], position:"1B", correct:"Field ball and run/throw to 1B", wrong:["Throw to 2B","Throw home","Pass to pitcher"] },
+  { situation:"Grounder to P",  runners:[], position:"P",  correct:"Field ball and throw to 1B", wrong:["Throw home","Throw to 2B","Hold the ball"] },
+  { situation:"Grounder to P",  runners:[], position:"2B", correct:"Back up the pitcher", wrong:["Cover 2B","Cover 3B","Back up 1B"] },
+  // GROUNDERS - Runner on 1st
+  { situation:"Grounder to 3B", runners:["1B"], position:"3B", correct:"Field ball and throw to 2B", wrong:["Throw to 1B","Throw home","Tag runner"] },
+  { situation:"Grounder to SS", runners:["1B"], position:"SS", correct:"Field ball and throw to 2B", wrong:["Throw to 1B","Throw home","Tag runner"] },
+  { situation:"Grounder to 2B", runners:["1B"], position:"2B", correct:"Field ball and throw to 2B (force out)", wrong:["Throw to 1B","Throw home","Hold the ball"] },
+  { situation:"Grounder to 2B", runners:["1B"], position:"SS", correct:"Cover 2B", wrong:["Back up 2B","Cover 3B","Back up SS"] },
+  { situation:"Grounder to 1B", runners:["1B"], position:"1B", correct:"Field ball and throw to 2B", wrong:["Run to 1B","Throw home","Throw to pitcher"] },
+  { situation:"Grounder to P",  runners:["1B"], position:"P",  correct:"Field ball and throw to 2B", wrong:["Throw to 1B","Throw home","Hold the ball"] },
+  // GROUNDERS - Runner on 2nd
+  { situation:"Grounder to 3B", runners:["2B"], position:"3B", correct:"Hold runner with eyes and throw to 1B", wrong:["Throw to 2B","Throw home","Tag runner"] },
+  { situation:"Grounder to SS", runners:["2B"], position:"SS", correct:"Hold runner with eyes and throw to 1B", wrong:["Throw to 2B","Throw home","Tag runner"] },
+  { situation:"Grounder to 2B", runners:["2B"], position:"2B", correct:"Hold runner with eyes and throw to 1B", wrong:["Throw to 3B","Throw home","Hold the ball"] },
+  { situation:"Grounder to 1B", runners:["2B"], position:"1B", correct:"Field ball, throw to 1B, then check runner at 3B", wrong:["Throw to 3B","Throw to 2B","Throw home"] },
+  { situation:"Grounder to P",  runners:["2B"], position:"P",  correct:"Hold runner with eyes and throw to 1B", wrong:["Throw to 3B","Throw home","Hold the ball"] },
+  // GROUNDERS - Runners on 1st & 2nd
+  { situation:"Grounder to 3B", runners:["1B","2B"], position:"3B", correct:"Field ball and tag runner/3B bag", wrong:["Throw to 1B","Throw to 2B","Throw home"] },
+  { situation:"Grounder to SS", runners:["1B","2B"], position:"SS", correct:"Field ball and throw to 3B", wrong:["Throw to 1B","Throw to 2B","Throw home"] },
+  { situation:"Grounder to 2B", runners:["1B","2B"], position:"2B", correct:"Field ball and throw to 3B", wrong:["Throw to 1B","Throw to 2B","Throw home"] },
+  { situation:"Grounder to 1B", runners:["1B","2B"], position:"1B", correct:"Field ball, throw to 1B, watch runner at 3B", wrong:["Throw to 3B","Throw to 2B","Throw home immediately"] },
+  { situation:"Grounder to P",  runners:["1B","2B"], position:"P",  correct:"Field ball and throw to 3B", wrong:["Throw to 1B","Throw to 2B","Throw home"] },
+];
+
+let currentQuestions = [];
+let qIndex = 0;
+let score = 0;
+let streak = 0;
+let correctCount = 0;
+let difficulty = 'easy';
+let answered = false;
+let selectedPosition = 'ALL';
+const TOTAL_Q = 10;
+
+const positionNames = {
+  "P":"Pitcher","C":"Catcher","1B":"First Baseman","2B":"Second Baseman",
+  "SS":"Shortstop","3B":"Third Baseman","LF":"Left Fielder","CF":"Center Fielder","RF":"Right Fielder"
+};
+
+function selectPosition(el, pos) {
+  selectedPosition = pos;
+  // Clear all pos-btn selected states
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('posBtn-ALL').classList.remove('selected');
+  el.classList.add('selected');
+
+  // Show warning if fewer than 5 questions exist for this position
+  const count = pos === 'ALL' ? allQuestions.length : allQuestions.filter(q => q.position === pos).length;
+  document.getElementById('posWarning').style.display = (pos !== 'ALL' && count < 5) ? 'block' : 'none';
+}
+
+function selectDiff(el, diff) {
+  difficulty = diff;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+
+  // Filter by selected position
+  let pool = selectedPosition === 'ALL'
+    ? [...allQuestions]
+    : allQuestions.filter(q => q.position === selectedPosition);
+
+  // If pool is smaller than TOTAL_Q, allow repeats by padding
+  if (pool.length < TOTAL_Q) {
+    while (pool.length < TOTAL_Q) pool = pool.concat(allQuestions.filter(q => q.position === selectedPosition));
+  }
+
+  currentQuestions = shuffle(pool).slice(0, TOTAL_Q);
+  qIndex = 0; score = 0; streak = 0; correctCount = 0;
+
+  // Show position mode in scoreboard
+  const indicator = document.getElementById('posModeIndicator');
+  if (selectedPosition !== 'ALL') {
+    indicator.style.display = 'inline-flex';
+    document.getElementById('posModeLabel').textContent = positionNames[selectedPosition] || selectedPosition;
+  } else {
+    indicator.style.display = 'none';
+  }
+
+  updateScoreboard();
+  showQuestion();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showQuestion() {
+  answered = false;
+  const q = currentQuestions[qIndex];
+
+  // Progress
+  document.getElementById('progressFill').style.width = ((qIndex / TOTAL_Q) * 100) + '%';
+  document.getElementById('qCounter').textContent = `Question ${qIndex + 1} of ${TOTAL_Q}`;
+
+  // Situation badge
+  document.getElementById('situationBadge').innerHTML = `🏟️ ${q.situation} — ${q.runners.length === 0 ? 'No Runners' : 'Runner' + (q.runners.length > 1 ? 's' : '') + ' on ' + q.runners.join(' & ')}`;
+
+  // Diamond
+  updateDiamond(q);
+
+  // Question text — personalized if position mode
+  if (selectedPosition !== 'ALL') {
+    document.getElementById('questionText').innerHTML = `<span style="font-size:1.1rem;font-weight:700;color:#0f2044;">You're the ${positionNames[q.position]}. What do YOU do?</span>`;
+  } else {
+    document.getElementById('questionText').innerHTML = `What should the <span style="display:inline-block;background:#d42b2b;color:#ffffff;padding:4px 14px;border-radius:8px;font-size:1.3rem;font-weight:900;">${q.position}</span> do?<br><span style="font-size:0.8rem;color:#666;font-weight:700;">(${positionNames[q.position]})</span>`;
+  }
+
+  // Build answers
+  let numChoices = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 3 : 4;
+  let choices = shuffle([q.correct, ...shuffle(q.wrong).slice(0, numChoices - 1)]);
+  const letters = ['A','B','C','D'];
+  const grid = document.getElementById('answersGrid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = numChoices <= 2 ? '1fr 1fr' : numChoices === 3 ? '1fr 1fr 1fr' : '1fr 1fr';
+  choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="answer-letter">${letters[i]}</span>${c}`;
+    btn.onclick = () => checkAnswer(btn, c, q.correct, choices);
+    grid.appendChild(btn);
+  });
+
+  // Hide feedback and next
+  const fb = document.getElementById('feedbackBanner');
+  fb.className = 'feedback-banner';
+  fb.style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  // Streak stars
+  updateStreakStars();
+}
+
+function updateDiamond(q) {
+  // Reset all position highlights
+  const positions = ['P','C','1B','2B','SS','3B','LF','CF','RF'];
+  positions.forEach(p => {
+    const el = document.getElementById('pos-' + p);
+    if (el) {
+      el.setAttribute('fill', p.length > 2 ? '#1a4d24' : '#5a3e1b');
+      el.setAttribute('font-size', '11');
+    }
+  });
+
+  // Highlight the active position
+  const active = document.getElementById('pos-' + q.position);
+  if (active) {
+    // Draw a highlight circle behind
+    active.setAttribute('fill', '#e63946');
+    active.setAttribute('font-size', '12');
+  }
+
+  // Runners
+  ['1B','2B','3B'].forEach(base => {
+    const dot = document.getElementById('runner' + base);
+    dot.setAttribute('opacity', q.runners.includes(base) ? '1' : '0');
+  });
+
+  // Highlight ball location
+  const ballMap = { 'LF':'#pos-LF','CF':'#pos-CF','RF':'#pos-RF','3B':'#pos-3B','SS':'#pos-SS','2B':'#pos-2B','1B':'#pos-1B','P':'#pos-P' };
+  const sit = q.situation;
+  const ballPos = sit.includes('LF') ? 'LF' : sit.includes('CF') ? 'CF' : sit.includes('RF') ? 'RF' :
+                  sit.includes('3B') ? '3B' : sit.includes('SS') ? 'SS' : sit.includes('2B') ? '2B' :
+                  sit.includes('1B') ? '1B' : sit.includes(' P') ? 'P' : null;
+
+  if (ballPos && ballPos !== q.position) {
+    const ballEl = document.getElementById('pos-' + ballPos);
+    if (ballEl) {
+      ballEl.setAttribute('fill', '#f97316');
+    }
+  }
+}
+
+function checkAnswer(btn, chosen, correct, allChoices) {
+  if (answered) return;
+  answered = true;
+  const btns = document.querySelectorAll('.answer-btn');
+
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    streak++;
+    correctCount++;
+    const bonus = streak >= 3 ? 20 : streak >= 2 ? 15 : 10;
+    score += bonus;
+    showFeedback(true, streak >= 2 ? `🔥 ${streak} in a row! +${bonus} points!` : `✅ Nice play! +${bonus} points!`);
+  } else {
+    btn.classList.add('wrong');
+    streak = 0;
+    // Reveal correct
+    btns.forEach(b => {
+      const text = b.textContent.replace(/^[ABCD]/,'').trim();
+      if (text === correct) b.classList.add('reveal-correct');
+    });
+    showFeedback(false, `❌ Not quite! The correct answer is: "${correct}"`);
+  }
+  btns.forEach(b => b.disabled = true);
+  updateScoreboard();
+  document.getElementById('nextBtn').style.display = 'block';
+}
+
+function showFeedback(correct, msg) {
+  const fb = document.getElementById('feedbackBanner');
+  fb.textContent = msg;
+  fb.className = 'feedback-banner show ' + (correct ? 'correct-fb' : 'wrong-fb');
+  fb.style.display = 'block';
+}
+
+function nextQuestion() {
+  qIndex++;
+  if (qIndex >= TOTAL_Q) {
+    showEndScreen();
+  } else {
+    // Re-animate card
+    const card = document.getElementById('questionCard');
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = '';
+    showQuestion();
+  }
+}
+
+function updateScoreboard() {
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  updateStreakStars();
+}
+
+function updateStreakStars() {
+  const stars = document.getElementById('streakStars');
+  if (streak === 0) { stars.textContent = ''; return; }
+  const emoji = streak >= 5 ? '🔥' : streak >= 3 ? '⭐' : '✨';
+  stars.textContent = emoji.repeat(Math.min(streak, 5));
+}
+
+function showEndScreen() {
+  document.getElementById('gameScreen').style.display = 'none';
+  const end = document.getElementById('endScreen');
+  end.classList.add('show');
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalCorrect').textContent = correctCount;
+  document.getElementById('progressFill').style.width = '100%';
+
+  const pct = correctCount / TOTAL_Q;
+  const posLabel = selectedPosition !== 'ALL' ? ` as ${positionNames[selectedPosition]}` : '';
+  let emoji, title, rating;
+  if (pct >= 0.9) { emoji = '🏆'; title = 'All-Star!'; rating = `You know every play${posLabel}! Coach is impressed! 🌟`; }
+  else if (pct >= 0.7) { emoji = '⭐'; title = 'Great Game!'; rating = `Really solid defense${posLabel}. Keep practicing! 💪`; }
+  else if (pct >= 0.5) { emoji = '⚾'; title = 'Good Effort!'; rating = `Getting there${posLabel}! Study those situations! 📖`; }
+  else { emoji = '🤙'; title = 'Keep Practicing!'; rating = `Run it back and get those plays down${posLabel}! 🏃`; }
+
+  document.getElementById('trophyEmoji').textContent = emoji;
+  document.getElementById('endTitle').textContent = title;
+  document.getElementById('ratingText').textContent = rating;
+
+  if (pct >= 0.7) launchConfetti();
+}
+
+function resetGame() {
+  document.getElementById('endScreen').classList.remove('show');
+  document.getElementById('startScreen').style.display = 'block';
+  document.getElementById('posModeIndicator').style.display = 'none';
+  score = 0; streak = 0; correctCount = 0;
+  updateScoreboard();
+}
+
+function launchConfetti() {
+  const colors = ['#d42b2b','#1a56b0','#ffffff','#e84040','#2d6fd4','#ff6b6b'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      c.style.animationDelay = (Math.random() * 0.5) + 's';
+      c.style.width = (8 + Math.random() * 8) + 'px';
+      c.style.height = (8 + Math.random() * 8) + 'px';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3000);
+    }, i * 40);
+  }
+}
+
+// Init
+updateScoreboard();
+</script>
+
+</body>
+</html>
